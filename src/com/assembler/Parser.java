@@ -10,9 +10,9 @@ public class Parser {
     private static ArrayList<Instruction> codeLines = new ArrayList<>();
     public final ArrayList<String> instructions = new ArrayList<>(
 
-            Arrays.asList("lw", "sw",
-                    "add", "addi", "sub", "and", "or", "andi", "ori", "sll", "slt", "slti", "lui",
-                    "jr", "j", "beq", "bne"
+            Arrays.asList("add","sub","and","or","sll","slt","lw", "sw",
+                     "addi", "andi", "ori", "slti", "lui",
+                     "jr", "j", "beq", "bne"
             ));
 
     Parser(String inputCode) {
