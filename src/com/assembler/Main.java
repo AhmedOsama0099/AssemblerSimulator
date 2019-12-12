@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        Parser parser=new Parser("aaa     ::");
+       // Parser parser=new Parser();
         /*String x="$s0        a,,,$s1";
         String[]arr=x.split(",");
         System.out.println(arr.length);

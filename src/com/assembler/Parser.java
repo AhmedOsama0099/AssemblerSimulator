@@ -48,14 +48,20 @@ public class Parser {
             count++;
         }
         System.out.println(mipsRegisters);
-        splitCodeAndLabelsAndCheckValidate(inputCode);
+        String exceptions=splitCodeAndLabelsAndCheckValidate(inputCode);
+        if(!exceptions.isEmpty()){
+            System.out.println(exceptions);
+        }
+        else{
+
+        }
     }
 
 
-    private String splitCodeAndLabelsAndCheckValidate(String inputCode) {
+    private  String splitCodeAndLabelsAndCheckValidate(String inputCode) {
         String exceptions = "";
         //String instruction="";
-        boolean op = true;//first one is command
+       // boolean op = true;//first one is command
         Instruction instruction;
         String line;
         ///String label="";
@@ -66,13 +72,14 @@ public class Parser {
             while ((line = reader.readLine()) != null) {
                 currentLine++;
                 instruction = new Instruction();
+                codeLines.add(instruction);
                 if (line == "\n")
                     continue;
                 line = line.trim();
                 checkLabel = line.indexOf(":");
                 if (checkLabel != -1) {
                     if (checkLabel != line.length() - 1) {
-                        exceptions += "error label definition at line " + currentLine + "\n";
+                        exceptions += "unexpected : at line " + currentLine + "\n";
                     } else if (line.length() == 1) {
                         exceptions += "no label name at line " + currentLine + "\n";
                     } else {
@@ -132,6 +139,7 @@ public class Parser {
                             }
                         }
                     }
+                    /**exceptions args*/
                 }
             }
 
@@ -141,6 +149,4 @@ public class Parser {
         }
         return exceptions;
     }
-
-
 }
