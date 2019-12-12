@@ -63,10 +63,77 @@ public class Parser {
                     case 0:
                         Commands.add(mipsRegisters, instruction.args);
                         break;
+                    case 1:
+                        Commands.sub(mipsRegisters, instruction.args);
+                        break;
+                    case 2:
+                        Commands.and(mipsRegisters, instruction.args);
+                        break;
+                    case 3:
+                        Commands.or(mipsRegisters, instruction.args);
+                        break;
+                    case 4:
+                        Commands.sll(mipsRegisters, instruction.args);
+                        break;
+                    case 5:
+                        Commands.slt(mipsRegisters, instruction.args);
+                        break;
+                    case 6:
+                        Commands.lw();
+                        break;
+                    case 7:
+                        Commands.sw();
+                        break;
+
                     case 8:
                         Commands.addi(mipsRegisters, instruction.args);
                         break;
+                    case 9:
+                        Commands.andi(mipsRegisters, instruction.args);
+                        break;
+                    case 10:
+                        Commands.ori(mipsRegisters, instruction.args);
+                        break;
+                    case 11:
+                        Commands.slti(mipsRegisters, instruction.args);
+                        break;
+                    case 12:
+                        Commands.lui();
+                        break;
+                    case 13:
+                        Commands.jr();
+                        break;
+                    case 14:
+                        int index=Commands.j(codeLines,instruction.args);
+                        if(index !=-1){
+                            i=index;
+                        }
+
+                        break;
+                    case 15:
+                        int index2=Commands.beq(mipsRegisters,codeLines,instruction.args,i);
+                        if(index2 !=-1){
+                            i=index2;
+                        }
+                        else{
+                            //exc label not found
+                        }
+                        break;
+                    case 16:
+                        int index3=Commands.bne(mipsRegisters,codeLines,instruction.args,i);
+                        if(index3 !=-1){
+                            i=index3;
+                        }
+                        else{
+                            //exc label not found
+                        }
+                        break;
+
+
+
+
                 }
+
 
             }
             System.out.println(mipsRegisters);
@@ -100,7 +167,7 @@ public class Parser {
                         exceptions += "no label name at line " + currentLine + "\n";
                     } else {
                         instruction.isLabel = true;
-                        String labelName = line.substring(0, checkLabel - 1);
+                        String labelName = line.substring(0, checkLabel );
                         instruction.labelName = (labelName.trim());
                         System.out.println(labelName.trim());
                         codeLines.add(instruction);
@@ -161,18 +228,30 @@ public class Parser {
                     if (!unKnownRegister) {
                         switch (instructions.indexOf(instruction.instruct)) {
                             case 0:
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 5:
                                 if (instruction.args.size() != 3) {
                                     exceptions += "argument should be 3 line " + currentLine + "\n";
                                 } else if (instruction.args.get(0).equals("$0")) {
                                     exceptions += "u shouldn't initialize value in $0 line " + currentLine + "\n";
                                 }
+                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$'||instruction.args.get(2).charAt(0)!='$')
+                                    exceptions += "argument 0 and 1 should be registers line " + currentLine + "\n";
                                 break;
+                            case 4:
                             case 8:
+                            case 9:
+                            case 10:
+                            case 11:
                                 if (instruction.args.size() != 3) {
                                     exceptions += "argument should be 3 line " + currentLine + "\n";
                                 } else if (instruction.args.get(0).equals("$0")) {
                                     exceptions += "u shouldn't initialize value in $0 line " + currentLine + "\n";
                                 }
+                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$')
+                                    exceptions += "argument 0 and 1 should be registers line " + currentLine + "\n";
                                 else{
                                     try {
                                         Integer.parseInt(instruction.args.get(2));
@@ -181,6 +260,26 @@ public class Parser {
                                     }
                                 }
                                 break;
+                            case 14:
+                                if (instruction.args.size() != 1) {
+                                    exceptions += "argument should be 1 line " + currentLine + "\n";
+                                }
+                                else if(instruction.args.get(0).charAt(0)=='$'){
+                                    exceptions += "Jump argument should be label line " + currentLine + "\n";
+                                }
+                                break;
+                            case 15:
+                            case 16:
+                                if (instruction.args.size() != 3) {
+                                    exceptions += "argument should be 3 line " + currentLine + "\n";
+                                }
+                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$'||instruction.args.get(2).charAt(0)=='$')
+                                {
+                                    exceptions += "argument 0 and 1  should be registers and 2 should be label line " + currentLine + "\n";
+                                }
+                                break;
+
+
                         }
                     }
 
