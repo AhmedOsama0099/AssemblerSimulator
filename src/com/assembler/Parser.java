@@ -53,7 +53,24 @@ public class Parser {
             System.out.println(exceptions);
         }
         else{
+            for(int i=0;i<codeLines.size();i++){
+                /*System.out.println("----------------------");
+                System.out.println(codeLines.get(i).instruct);
+                for(int j=0;j<codeLines.get(i).args.size();j++){
+                    System.out.println(codeLines.get(i).args.get(j));
+                }*/
+                Instruction instruction=codeLines.get(i);
+                switch (instructions.indexOf(instruction.instruct)){
+                    case 0:
+                        Commands.add(mipsRegisters,instruction.args);
+                        break;
+                    case 8:
+                        Commands.addi(mipsRegisters,instruction.args);
+                        break;
+                }
 
+            }
+            System.out.println(mipsRegisters);
         }
     }
 
@@ -126,20 +143,34 @@ public class Parser {
                     line = line.substring(tmp.length() + 1);
                     line = line.trim();
                     String[] args = line.split(",");
+                    boolean unKnownRegister=false;
                     for (int i = 0; i < args.length; i++) {
                         if (args[i].length() == 0) {//,,
                             exceptions += "unexpected , at line " + currentLine + "\n";
                             break;
                         } else {
-                            if (mipsRegisters.containsKey(args[i]))
-                                instruction.registers.add(args[i].trim());
+                            args[i]=args[i].trim();
+                            if (mipsRegisters.containsKey(args[i])||args[i].charAt(0)!='$')
+                                instruction.args.add(args[i].trim());
                             else {
+                                unKnownRegister=true;
                                 exceptions += "unknown register at line " + currentLine + "\n";
                                 break;
                             }
                         }
                     }
-                    /**exceptions args*/
+                    if(!unKnownRegister){
+                        switch (instructions.indexOf(instruction.instruct)){
+                            case 0:
+                                if(instruction.args.size()!=3){
+                                    exceptions+="argument should be 3 line "+currentLine+"\n";
+                                }
+                                else if(instruction.args.get(0).equals("$0")){
+                                    exceptions+="u shouldn't initialize value in $0 line "+currentLine+"\n";
+                                }
+                        }
+                    }
+
                 }
             }
 

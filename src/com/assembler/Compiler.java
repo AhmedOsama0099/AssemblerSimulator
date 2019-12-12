@@ -41,6 +41,12 @@ public class Compiler extends JFrame{
                 }
             }
         });
+        startCompileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Parser parser=new Parser(inputCode.getText());
+            }
+        });
     }
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

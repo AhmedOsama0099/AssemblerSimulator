@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Instruction {
     String instruct;//
     String labelName;
-    ArrayList<String>registers=new ArrayList<>();
+    ArrayList<String>args=new ArrayList<>();
     Boolean isLabel=false;
     Boolean rType=false;
     Boolean iType=false;
@@ -14,9 +14,9 @@ public class Instruction {
     public Instruction() {
     }
 
-    public Instruction(String instruct, ArrayList<String> registers, Boolean isLabel, Boolean rType, Boolean iType, Boolean jType) {
+    public Instruction(String instruct, ArrayList<String> args, Boolean isLabel, Boolean rType, Boolean iType, Boolean jType) {
         this.instruct = instruct;
-        this.registers = registers;
+        this.args = args;
         this.isLabel = isLabel;
         this.rType = rType;
         this.iType = iType;
