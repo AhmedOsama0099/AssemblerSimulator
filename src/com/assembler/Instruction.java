@@ -3,7 +3,7 @@ package com.assembler;
 import java.util.ArrayList;
 
 public class Instruction {
-    String instruct;
+    String instruct;//
     String labelName;
     ArrayList<String>registers=new ArrayList<>();
     Boolean isLabel=false;
