@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Parser {
     private static ArrayList<Instruction> codeLines = new ArrayList<>();
-    public final Map<String,Integer> mipsRegisters = new HashMap<>();
+    public final Map<String, Integer> mipsRegisters = new HashMap<>();
 
     public final ArrayList<String> instructions = new ArrayList<>(
 
@@ -18,30 +18,31 @@ public class Parser {
                     "addi", "andi", "ori", "slti", "lui",
                     "jr", "j", "beq", "bne"
             ));
+
     ///
     Parser(String inputCode) {
         codeLines.clear();
-        mipsRegisters.put("$0",0);
-        mipsRegisters.put("$at",0);
-        mipsRegisters.put("$v0",0);
-        mipsRegisters.put("$v1",0);
-        int count=4;
-        while(count<32){
-            if(count<8)
-                mipsRegisters.put("$a"+(count-4),0);
-            else if(count<16)
-                mipsRegisters.put("$t"+(count-8),0);
-            else if(count<24)
-                mipsRegisters.put("$s"+(count-16),0);
-            else if(count<26){
-                mipsRegisters.put("$t8",0);
-                mipsRegisters.put("$t9",0);
-                mipsRegisters.put("$k0",0);
-                mipsRegisters.put("$k1",0);
-                mipsRegisters.put("$gp",0);
-                mipsRegisters.put("$sp",0);
-                mipsRegisters.put("$fp",0);
-                mipsRegisters.put("$ra",0);
+        mipsRegisters.put("$0", 0);
+        mipsRegisters.put("$at", 0);
+        mipsRegisters.put("$v0", 0);
+        mipsRegisters.put("$v1", 0);
+        int count = 4;
+        while (count < 32) {
+            if (count < 8)
+                mipsRegisters.put("$a" + (count - 4), 0);
+            else if (count < 16)
+                mipsRegisters.put("$t" + (count - 8), 0);
+            else if (count < 24)
+                mipsRegisters.put("$s" + (count - 16), 0);
+            else if (count < 26) {
+                mipsRegisters.put("$t8", 0);
+                mipsRegisters.put("$t9", 0);
+                mipsRegisters.put("$k0", 0);
+                mipsRegisters.put("$k1", 0);
+                mipsRegisters.put("$gp", 0);
+                mipsRegisters.put("$sp", 0);
+                mipsRegisters.put("$fp", 0);
+                mipsRegisters.put("$ra", 0);
                 break;
             }
             count++;
@@ -115,19 +116,20 @@ public class Parser {
                             }
                         }
                     }
-                    line=line.substring(tmp.length()+1);
-                    line=line.trim();
-                    String []args=line.split(",");
-                    for(int i=0;i<args.length;i++){
-                        if(args[i].length()==0){//,,
-                            exceptions+="unexpected , at line "+currentLine+"\n";
+                    line = line.substring(tmp.length() + 1);
+                    line = line.trim();
+                    String[] args = line.split(",");
+                    for (int i = 0; i < args.length; i++) {
+                        if (args[i].length() == 0) {//,,
+                            exceptions += "unexpected , at line " + currentLine + "\n";
                             break;
-                        }
-                        else{
-                            if(mipsRegisters.containsKey(args[i]))
+                        } else {
+                            if (mipsRegisters.containsKey(args[i]))
                                 instruction.registers.add(args[i].trim());
-                            else
-                                exceptions+="unknown register at line "+currentLine+"\n";
+                            else {
+                                exceptions += "unknown register at line " + currentLine + "\n";
+                                break;
+                            }
                         }
                     }
                 }
