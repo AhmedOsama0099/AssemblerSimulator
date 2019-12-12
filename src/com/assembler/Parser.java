@@ -92,7 +92,6 @@ public class Parser {
                             exceptions+="unexpected , at line "+currentLine+"\n";
                             break;
                         }
-                            
                     }
                 }
             }
