@@ -124,7 +124,10 @@ public class Parser {
                             break;
                         }
                         else{
-                            instruction.registers.add(args[i].trim());
+                            if(mipsRegisters.containsKey(args[i]))
+                                instruction.registers.add(args[i].trim());
+                            else
+                                exceptions+="unknown register at line "+currentLine+"\n";
                         }
                     }
                 }
