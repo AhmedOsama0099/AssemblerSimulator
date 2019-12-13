@@ -297,6 +297,20 @@ public class Parser {
                                     }
                                 }
                                 break;
+                            case 12:
+                                if(instruction.args.get(0).equals("$0")){
+                                    exceptions+="u cannot load word in $0 at line " + currentLine + "\n";
+                                }
+                            case 13:
+                                if(instruction.args.size()!=2){
+                                    exceptions+="argument should be 2 at line " + currentLine + "\n";
+                                }
+                                else if(instruction.args.get(0).charAt(0)!='$'){
+                                    exceptions+="first argument should be register at line " + currentLine + "\n";
+                                }else{
+                                    exceptions+=handelLwAndSW(instruction,currentLine);
+                                }
+                                break;
                             case 14:
                                 if (instruction.args.size() != 1) {
                                     exceptions += "argument should be 1 at line " + currentLine + "\n";
@@ -330,4 +344,56 @@ public class Parser {
         }
         return exceptions;
     }
+
+    private String handelLwAndSW(Instruction instruction,int currentLine) {
+        //ArrayList<String>args=instruction.args;
+        ArrayList<String>newArgs=new ArrayList<>();
+        newArgs.add(instruction.args.get(0));
+        int chk1=0,chk2=0;
+        String exceptions="";
+        String tmp="";
+        String secondArgs=instruction.args.get(1);
+        for(int i=0;i<secondArgs.length();i++){
+            tmp+=secondArgs.charAt(i);
+            if(secondArgs.charAt(i)=='('){
+                chk1++;
+                try {
+                    StringBuilder sb = new StringBuilder(tmp);
+                    sb.deleteCharAt(tmp.length() - 1);
+                    tmp = sb.toString();
+                    tmp=tmp.trim();
+                    Integer.valueOf(tmp);
+                    newArgs.add(tmp);
+                    tmp="";
+                }catch (Exception e){
+                    exceptions+="error at second argument at line "+currentLine+"\n";
+                }
+            }
+            else if(secondArgs.charAt(i)==')'){
+                chk2++;
+                StringBuilder sb = new StringBuilder(tmp);
+                sb.deleteCharAt(tmp.length() - 1);
+                tmp = sb.toString();
+                tmp=tmp.trim();
+                newArgs.add(tmp);
+                if(!mipsRegisters.containsKey(tmp)){
+                    exceptions+="second argument should contain register at line "+currentLine+"\n";
+                }
+            }
+        }
+        if(chk1>1){
+            exceptions+="unExcpected ( at line "+currentLine+"\n";
+        }
+        else if(chk2>1){
+            exceptions+="unExcpected ) at line "+currentLine+"\n";
+        }
+        if(newArgs.size()!=2){
+            exceptions+="error at line "+currentLine+"\n";
+        }
+        if(exceptions.isEmpty()){
+            instruction.args=newArgs;
+        }
+        return exceptions;
+    }
+
 }
