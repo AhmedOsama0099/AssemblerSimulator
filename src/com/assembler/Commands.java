@@ -29,10 +29,10 @@ public class Commands {
         else
             mipsRegisters.replace(args.get(0),0);
     }
-    public static void lw(){
+    public static void lw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
 
     }
-    public static void sw(){
+    public static void sw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
 
     }
     public static void addi(Map<String,Integer> mipsRegisters, ArrayList<String> args){

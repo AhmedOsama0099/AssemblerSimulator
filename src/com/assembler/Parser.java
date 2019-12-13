@@ -11,30 +11,38 @@ import java.util.Map;
 public class Parser {
     private static ArrayList<Instruction> codeLines = new ArrayList<>();
     public final Map<String, Integer> mipsRegisters = new HashMap<>();
-
+    public static ArrayList<String> labelNedToBeFound = new ArrayList<>();
+    public static ArrayList<String> registerIndexes = new ArrayList<>();
     public final ArrayList<String> instructions = new ArrayList<>(
-
             Arrays.asList("add", "sub", "and", "or", "sll", "slt", "lw", "sw",
                     "addi", "andi", "ori", "slti", "lui",
                     "jr", "j", "beq", "bne"
             ));
-
+    public static int[] memory=new int[2000];
     ///
     Parser(String inputCode) {
+        labelNedToBeFound.clear();
         codeLines.clear();
         mipsRegisters.put("$0", 0);
         mipsRegisters.put("$at", 0);
         mipsRegisters.put("$v0", 0);
         mipsRegisters.put("$v1", 0);
+        registerIndexes.add("$0");
+        registerIndexes.add("$at");
+        registerIndexes.add("$v0");
+        registerIndexes.add("$v1");
         int count = 4;
         while (count < 32) {
-            if (count < 8)
+            if (count < 8) {
                 mipsRegisters.put("$a" + (count - 4), 0);
-            else if (count < 16)
+                registerIndexes.add("$a" + (count - 4));
+            } else if (count < 16) {
                 mipsRegisters.put("$t" + (count - 8), 0);
-            else if (count < 24)
+                registerIndexes.add("$t" + (count - 8));
+            } else if (count < 24) {
                 mipsRegisters.put("$s" + (count - 16), 0);
-            else if (count < 26) {
+                registerIndexes.add("$s" + (count - 16));
+            } else if (count < 26) {
                 mipsRegisters.put("$t8", 0);
                 mipsRegisters.put("$t9", 0);
                 mipsRegisters.put("$k0", 0);
@@ -43,12 +51,28 @@ public class Parser {
                 mipsRegisters.put("$sp", 0);
                 mipsRegisters.put("$fp", 0);
                 mipsRegisters.put("$ra", 0);
+                registerIndexes.add("$t8");
+                registerIndexes.add("$t9");
+                registerIndexes.add("$k0");
+                registerIndexes.add("$k1");
+                registerIndexes.add("$gp");
+                registerIndexes.add("$sp");
+                registerIndexes.add("$fp");
+                registerIndexes.add("$ra");
                 break;
             }
             count++;
         }
+        System.out.println(memory[1400]);
+        System.out.println(registerIndexes);
         System.out.println(mipsRegisters);
         String exceptions = splitCodeAndLabelsAndCheckValidate(inputCode);
+        for (int i = 0; i < labelNedToBeFound.size(); i++) {
+            String[] labelAndErrorLine = labelNedToBeFound.get(i).split(" ");
+            if (!labelFound(labelAndErrorLine[0])) {
+                exceptions += labelAndErrorLine[0] + " not found at line " + labelAndErrorLine[1];
+            }
+        }
         if (!exceptions.isEmpty()) {
             System.out.println(exceptions);
         } else {
@@ -79,10 +103,10 @@ public class Parser {
                         Commands.slt(mipsRegisters, instruction.args);
                         break;
                     case 6:
-                        Commands.lw();
+//                        Commands.lw();
                         break;
                     case 7:
-                        Commands.sw();
+//                        Commands.sw();
                         break;
 
                     case 8:
@@ -104,32 +128,28 @@ public class Parser {
                         Commands.jr();
                         break;
                     case 14:
-                        int index=Commands.j(codeLines,instruction.args);
-                        if(index !=-1){
-                            i=index;
+                        int index = Commands.j(codeLines, instruction.args);
+                        if (index != -1) {
+                            i = index;
                         }
 
                         break;
                     case 15:
-                        int index2=Commands.beq(mipsRegisters,codeLines,instruction.args,i);
-                        if(index2 !=-1){
-                            i=index2;
-                        }
-                        else{
+                        int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
+                        if (index2 != -1) {
+                            i = index2;
+                        } else {
                             //exc label not found
                         }
                         break;
                     case 16:
-                        int index3=Commands.bne(mipsRegisters,codeLines,instruction.args,i);
-                        if(index3 !=-1){
-                            i=index3;
-                        }
-                        else{
+                        int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
+                        if (index3 != -1) {
+                            i = index3;
+                        } else {
                             //exc label not found
                         }
                         break;
-
-
 
 
                 }
@@ -138,6 +158,15 @@ public class Parser {
             }
             System.out.println(mipsRegisters);
         }
+    }
+
+    private boolean labelFound(String s) {
+        for (int i = 0; i < codeLines.size(); i++) {
+            if (codeLines.get(i).isLabel && codeLines.get(i).labelName.equals(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -167,13 +196,19 @@ public class Parser {
                         exceptions += "no label name at line " + currentLine + "\n";
                     } else {
                         instruction.isLabel = true;
-                        String labelName = line.substring(0, checkLabel );
-                        instruction.labelName = (labelName.trim());
+                        String labelName = line.substring(0, checkLabel);
+                        labelName = labelName.trim();
+                        if (labelName.contains(" ")) {
+                            exceptions += "label name shouldn't contain spaces at line " + currentLine + "\n";
+                            continue;
+                        }
+                        instruction.labelName = (labelName);
                         System.out.println(labelName.trim());
                         codeLines.add(instruction);
                         //instruction=new Instruction();
                     }
                 } else {
+
                     line = line.trim();
                     instruction.instruct = "";
                     // boolean isInstruct = true;
@@ -211,11 +246,11 @@ public class Parser {
                     String[] args = line.split(",");
                     boolean unKnownRegister = false;
                     for (int i = 0; i < args.length; i++) {
+                        args[i] = args[i].trim();
                         if (args[i].length() == 0) {//,,
                             exceptions += "unexpected , at line " + currentLine + "\n";
                             break;
                         } else {
-                            args[i] = args[i].trim();
                             if (mipsRegisters.containsKey(args[i]) || args[i].charAt(0) != '$')
                                 instruction.args.add(args[i].trim());
                             else {
@@ -233,12 +268,14 @@ public class Parser {
                             case 3:
                             case 5:
                                 if (instruction.args.size() != 3) {
-                                    exceptions += "argument should be 3 line " + currentLine + "\n";
+                                    exceptions += "argument should be 3 at line " + currentLine + "\n";
                                 } else if (instruction.args.get(0).equals("$0")) {
-                                    exceptions += "u shouldn't initialize value in $0 line " + currentLine + "\n";
+                                    exceptions += "u shouldn't initialize value in $0 at line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).charAt(0) != '$' || instruction.args.get(1).charAt(0) != '$' || instruction.args.get(2).charAt(0) != '$')
+                                    exceptions += "argument 0 and 1 should be registers at line " + currentLine + "\n";
+                                else {
+                                    instruction.rType = true;
                                 }
-                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$'||instruction.args.get(2).charAt(0)!='$')
-                                    exceptions += "argument 0 and 1 should be registers line " + currentLine + "\n";
                                 break;
                             case 4:
                             case 8:
@@ -248,38 +285,39 @@ public class Parser {
                                 if (instruction.args.size() != 3) {
                                     exceptions += "argument should be 3 line " + currentLine + "\n";
                                 } else if (instruction.args.get(0).equals("$0")) {
-                                    exceptions += "u shouldn't initialize value in $0 line " + currentLine + "\n";
-                                }
-                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$')
-                                    exceptions += "argument 0 and 1 should be registers line " + currentLine + "\n";
-                                else{
+                                    exceptions += "u shouldn't initialize value in $0 at line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).charAt(0) != '$' || instruction.args.get(1).charAt(0) != '$')
+                                    exceptions += "argument 0 and 1 should be registers at line " + currentLine + "\n";
+                                else {
                                     try {
                                         Integer.parseInt(instruction.args.get(2));
-                                    }catch (Exception e){
-                                        exceptions += "addi third argument should be constant " + currentLine + "\n";
+                                        instruction.iType = true;
+                                    } catch (Exception e) {
+                                        exceptions += "addi third argument should be constant at line " + currentLine + "\n";
                                     }
                                 }
                                 break;
                             case 14:
                                 if (instruction.args.size() != 1) {
-                                    exceptions += "argument should be 1 line " + currentLine + "\n";
-                                }
-                                else if(instruction.args.get(0).charAt(0)=='$'){
-                                    exceptions += "Jump argument should be label line " + currentLine + "\n";
+                                    exceptions += "argument should be 1 at line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).charAt(0) == '$') {
+                                    exceptions += "Jump argument should be label at line " + currentLine + "\n";
+                                } else {
+                                    labelNedToBeFound.add(instruction.args.get(0) + " " + currentLine);
+                                    instruction.jType = true;
                                 }
                                 break;
                             case 15:
                             case 16:
                                 if (instruction.args.size() != 3) {
-                                    exceptions += "argument should be 3 line " + currentLine + "\n";
-                                }
-                                else if(instruction.args.get(0).charAt(0)!='$'||instruction.args.get(1).charAt(0)!='$'||instruction.args.get(2).charAt(0)=='$')
-                                {
-                                    exceptions += "argument 0 and 1  should be registers and 2 should be label line " + currentLine + "\n";
+                                    exceptions += "argument should be 3 at line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).charAt(0) != '$' || instruction.args.get(1).charAt(0) != '$' || instruction.args.get(2).charAt(0) == '$') {
+                                    exceptions += "argument 0 and 1  should be registers and 2 should be label at line " + currentLine + "\n";
+                                } else {
+                                    labelNedToBeFound.add(instruction.args.get(2) + " " + currentLine);
+                                    instruction.iType = true;
                                 }
                                 break;
-
-
                         }
                     }
 
