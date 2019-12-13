@@ -29,11 +29,23 @@ public class Commands {
         else
             mipsRegisters.replace(args.get(0),0);
     }
-    public static void lw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
-
+    public static String lw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
+        int num=Integer.parseInt(args.get(1));
+        int numOfRegister=mipsRegisters.get(args.get(2));
+        if(num+numOfRegister>1999) {
+            mipsRegisters.replace(args.get(0),memory[num+numOfRegister]);
+            return "";
+        }
+        else  return "Unvalid memory";
     }
-    public static void sw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
-
+    public static String sw(int[]memory,Map<String,Integer> mipsRegisters,ArrayList<String> args){
+        int num=Integer.parseInt(args.get(1));
+        int numOfRegister=mipsRegisters.get(args.get(2));
+        if(num+numOfRegister>1999) {
+            memory[num+numOfRegister]=mipsRegisters.get(args.get(0));
+            return "";
+        }
+        else return "Unvalid memory";
     }
     public static void addi(Map<String,Integer> mipsRegisters, ArrayList<String> args){
         System.out.println(args);
