@@ -11,6 +11,8 @@ import java.util.Map;
 public class Parser {
     private static ArrayList<Instruction> codeLines = new ArrayList<>();
     public final Map<String, Integer> mipsRegisters = new HashMap<>();
+    public static Map<String,String>opcode= new HashMap<>();
+    public static Map<String,String>functcode= new HashMap<>();
     public static ArrayList<String> labelNedToBeFound = new ArrayList<>();
     public static ArrayList<String> registerIndexes = new ArrayList<>();
     public final ArrayList<String> instructions = new ArrayList<>(
@@ -23,6 +25,33 @@ public class Parser {
     Parser(String inputCode) {
         labelNedToBeFound.clear();
         codeLines.clear();
+        opcode.clear();
+        functcode.clear();
+        opcode.put("add","000000");
+        opcode.put("sub","000000");
+        opcode.put("and","000000");
+        opcode.put("or","000000");
+        opcode.put("sll","000000");
+        opcode.put("slt","000000");
+        opcode.put("jr","000000");
+        opcode.put("lw","100011");
+        opcode.put("sw","101011");
+        opcode.put("addi","001000");
+        opcode.put("andi","001100");
+        opcode.put("ori","001101");
+        opcode.put("slti","001010");
+        opcode.put("lui","001111");
+        opcode.put("j","000010");
+        opcode.put("beq","000100");
+        opcode.put("bne","000101");
+        functcode.put("add","100000");
+        functcode.put("sub","100010");
+        functcode.put("and","100100");
+        functcode.put("or","100101");
+        functcode.put("sll","000000");
+        functcode.put("slt","101010");
+        functcode.put("jr","001000");
+
         mipsRegisters.put("$0", 0);
         mipsRegisters.put("$at", 0);
         mipsRegisters.put("$v0", 0);
@@ -85,57 +114,58 @@ public class Parser {
                 Instruction instruction = codeLines.get(i);
                 switch (instructions.indexOf(instruction.instruct)) {
                     case 0:
-                        Commands.add(mipsRegisters, instruction.args);
+                        Commands.add(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 1:
-                        Commands.sub(mipsRegisters, instruction.args);
+                        Commands.sub(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 2:
-                        Commands.and(mipsRegisters, instruction.args);
+                        Commands.and(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 3:
-                        Commands.or(mipsRegisters, instruction.args);
+                        Commands.or(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 4:
-                        Commands.sll(mipsRegisters, instruction.args);
+                        Commands.sll(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 5:
-                        Commands.slt(mipsRegisters, instruction.args);
+                        Commands.slt(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 6:
-//                        Commands.lw();
+                    if(Commands.lw(memory,mipsRegisters,instruction.args,instruction.instructionCode)=="")
                         break;
+                    else return;
                     case 7:
-//                        Commands.sw();
+                    if(Commands.sw(memory,mipsRegisters,instruction.args,instruction.instructionCode)=="")
                         break;
-
+                    else return;
                     case 8:
-                        Commands.addi(mipsRegisters, instruction.args);
+                        Commands.addi(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 9:
-                        Commands.andi(mipsRegisters, instruction.args);
+                        Commands.andi(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 10:
-                        Commands.ori(mipsRegisters, instruction.args);
+                        Commands.ori(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 11:
-                        Commands.slti(mipsRegisters, instruction.args);
+                        Commands.slti(memory,mipsRegisters, instruction.args,instruction.instructionCode);
                         break;
                     case 12:
                         Commands.lui();
                         break;
                     case 13:
-                        Commands.jr();
+                        int countIndex=Commands.jr(memory,mipsRegisters,instruction.args,instruction.instructionCode);
+                        if (countIndex != -1)
+                            i = countIndex;
                         break;
                     case 14:
-                        int index = Commands.j(codeLines, instruction.args);
-                        if (index != -1) {
+                        int index = Commands.j(memory,codeLines, instruction.args,instruction.instructionCode);
+                        if (index != -1)
                             i = index;
-                        }
-
                         break;
                     case 15:
-                        int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
+                        int index2 = Commands.beq(memory,mipsRegisters, codeLines, instruction.args, i,instruction.instructionCode);
                         if (index2 != -1) {
                             i = index2;
                         } else {
@@ -143,18 +173,14 @@ public class Parser {
                         }
                         break;
                     case 16:
-                        int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
+                        int index3 = Commands.bne(memory,mipsRegisters, codeLines, instruction.args, i,instruction.instructionCode);
                         if (index3 != -1) {
                             i = index3;
                         } else {
                             //exc label not found
                         }
                         break;
-
-
                 }
-
-
             }
             System.out.println(mipsRegisters);
         }
@@ -241,26 +267,27 @@ public class Parser {
                             }
                         }
                     }
-                    line = line.substring(tmp.length() + 1);
+                    line = line.substring(tmp.length() );
                     line = line.trim();
                     String[] args = line.split(",");
-                    boolean unKnownRegister = false;
+                    boolean someError = false;
                     for (int i = 0; i < args.length; i++) {
                         args[i] = args[i].trim();
                         if (args[i].length() == 0) {//,,
                             exceptions += "unexpected , at line " + currentLine + "\n";
+                            someError=true;
                             break;
                         } else {
                             if (mipsRegisters.containsKey(args[i]) || args[i].charAt(0) != '$')
                                 instruction.args.add(args[i].trim());
                             else {
-                                unKnownRegister = true;
+                                someError = true;
                                 exceptions += "unknown register at line " + currentLine + "\n";
                                 break;
                             }
                         }
                     }
-                    if (!unKnownRegister) {
+                    if (!someError) {
                         switch (instructions.indexOf(instruction.instruct)) {
                             case 0:
                             case 1:
@@ -278,6 +305,22 @@ public class Parser {
                                 }
                                 break;
                             case 4:
+                                if (instruction.args.size() != 3) {
+                                    exceptions += "argument should be 3 line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).equals("$0")) {
+                                    exceptions += "u shouldn't initialize value in $0 at line " + currentLine + "\n";
+                                } else if (instruction.args.get(0).charAt(0) != '$' || instruction.args.get(1).charAt(0) != '$')
+                                    exceptions += "argument 0 and 1 should be registers at line " + currentLine + "\n";
+                                else {
+                                    try {
+                                        Integer.parseInt(instruction.args.get(2));
+                                        instruction.rType = true;
+                                    } catch (Exception e) {
+                                        exceptions += "addi third argument should be constant at line " + currentLine + "\n";
+                                    }
+                                }
+                                break;
+
                             case 8:
                             case 9:
                             case 10:
@@ -297,19 +340,34 @@ public class Parser {
                                     }
                                 }
                                 break;
-                            case 12:
+                            case 12:/****/
+                                instruction.iType=true;
+                                break;
+                            case 13:
+                                if(instruction.args.size()!=1){
+                                    exceptions+="jr should be 1 argument at line "+currentLine+"\n";
+                                }
+                                else if(instruction.args.get(0).charAt(0)!='$'){
+                                    exceptions+="jr argument should be register at line "+currentLine+"\n";
+                                }
+                                instruction.rType=true;
+                                break;
+                            case 6:
                                 if(instruction.args.get(0).equals("$0")){
                                     exceptions+="u cannot load word in $0 at line " + currentLine + "\n";
                                 }
-                            case 13:
+                            case 7:
                                 if(instruction.args.size()!=2){
                                     exceptions+="argument should be 2 at line " + currentLine + "\n";
                                 }
                                 else if(instruction.args.get(0).charAt(0)!='$'){
                                     exceptions+="first argument should be register at line " + currentLine + "\n";
-                                }else{
-                                    exceptions+=handelLwAndSW(instruction,currentLine);
                                 }
+                                  else  {
+                                      exceptions+=handelLwAndSW(instruction,currentLine);
+                                      instruction.iType=true;
+                                  }
+
                                 break;
                             case 14:
                                 if (instruction.args.size() != 1) {
@@ -346,7 +404,6 @@ public class Parser {
     }
 
     private String handelLwAndSW(Instruction instruction,int currentLine) {
-        //ArrayList<String>args=instruction.args;
         ArrayList<String>newArgs=new ArrayList<>();
         newArgs.add(instruction.args.get(0));
         int chk1=0,chk2=0;
@@ -387,7 +444,7 @@ public class Parser {
         else if(chk2>1){
             exceptions+="unExcpected ) at line "+currentLine+"\n";
         }
-        if(newArgs.size()!=2){
+        if(newArgs.size()!=3){
             exceptions+="error at line "+currentLine+"\n";
         }
         if(exceptions.isEmpty()){

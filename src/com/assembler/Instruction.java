@@ -1,15 +1,17 @@
 package com.assembler;
 
 import java.util.ArrayList;
+import java.util.function.BinaryOperator;
 
 public class Instruction {
     String instruct;//
     String labelName;
-    ArrayList<String>args=new ArrayList<>();
-    Boolean isLabel=false;
-    Boolean rType=false;
-    Boolean iType=false;
-    Boolean jType=false;
+    ArrayList<String> args = new ArrayList<>();
+    Boolean isLabel = false;
+    Boolean rType = false;
+    Boolean iType = false;
+    Boolean jType = false;
+    String instructionCode = "";
 
     public Instruction() {
     }
@@ -21,5 +23,102 @@ public class Instruction {
         this.rType = rType;
         this.iType = iType;
         this.jType = jType;
+    }
+
+    void setInstructionCode() {
+
+        if (this.rType) {
+            if(!this.instruct.equals("sll") && !this.instruct.equals("jr")){
+                instructionCode += Parser.opcode.get(this.instruct);
+                String temp = "";
+                int indx = -1;
+                indx = Parser.registerIndexes.indexOf(this.args.get(1));
+                temp=Integer.toBinaryString(indx);
+                while (temp.length()<5){
+                    temp="0"+temp;
+                }
+                instructionCode+=temp;
+
+                indx = Parser.registerIndexes.indexOf(this.args.get(2));
+                temp=Integer.toBinaryString(indx);
+                while (temp.length()<5){
+                    temp="0"+temp;
+                }
+                instructionCode+=temp;
+                indx = Parser.registerIndexes.indexOf(this.args.get(0));
+                temp=Integer.toBinaryString(indx);
+                while (temp.length()<5){
+                    temp="0"+temp;
+                }
+                instructionCode+=temp;
+                instructionCode+="00000";
+                instructionCode+=Parser.functcode.get(this.instruct);
+
+            }
+            else if (this.instruct.equals("jr")){
+                instructionCode += Parser.opcode.get(this.instruct);
+                String temp = "";
+                int indx = -1;
+                instructionCode+="00000"+"00000";
+                indx = Parser.registerIndexes.indexOf(this.args.get(0));
+                temp=Integer.toBinaryString(indx);
+                while (temp.length()<5){
+                    temp="0"+temp;
+                }
+                instructionCode+=temp;
+                instructionCode+="00000";
+                instructionCode+=Parser.functcode.get(this.instruct);
+            }
+            else {
+                instructionCode += Parser.opcode.get(this.instruct);
+                String temp = "";
+                int indx = -1;
+                instructionCode += "00000";
+
+                indx = Parser.registerIndexes.indexOf(this.args.get(1));
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
+                }
+                instructionCode += temp;
+                indx = Parser.registerIndexes.indexOf(this.args.get(0));
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
+                }
+                instructionCode += temp;
+                temp = Integer.toBinaryString(Integer.valueOf(this.args.get(2)));
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
+                }
+                instructionCode += Parser.functcode.get(this.instruct);
+            }
+
+        } else if (this.iType) {
+            instructionCode += Parser.opcode.get(this.instruct);
+            String temp = "";
+            int indx = -1;
+            indx = Parser.registerIndexes.indexOf(this.args.get(0));
+            temp=Integer.toBinaryString(indx);
+            while (temp.length()<5){
+                temp="0"+temp;
+            }
+            instructionCode+=temp;
+            indx = Parser.registerIndexes.indexOf(this.args.get(1));
+            temp=Integer.toBinaryString(indx);
+            while (temp.length()<5){
+                temp="0"+temp;
+            }
+            instructionCode+=temp;
+            temp = Integer.toBinaryString(Integer.valueOf(this.args.get(2)));
+            while (temp.length() < 16) {
+                temp = "0" + temp;
+            }
+            instructionCode += temp;
+        }
+        else {
+            instructionCode += Parser.opcode.get(this.instruct);
+
+        }
     }
 }
