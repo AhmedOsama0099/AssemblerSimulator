@@ -23,6 +23,7 @@ public class Parser {
     public static int[] memory = new int[2000];
 
     ///
+    //
     Parser(String inputCode) {
         labelNedToBeFound.clear();
         codeLines.clear();
