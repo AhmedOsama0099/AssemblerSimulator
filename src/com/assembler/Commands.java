@@ -43,7 +43,7 @@ public class Commands {
     public static String lw(int[] memory, Map<String, Integer> mipsRegisters, ArrayList<String> args) {
         int num = Integer.parseInt(args.get(1));
         int numOfRegister = mipsRegisters.get(args.get(2)) + 1000;
-        if (num + numOfRegister <= 2000) {
+        if (num + numOfRegister <= 2000&&num+numOfRegister>=1000) {
             mipsRegisters.replace(args.get(0), memory[num + numOfRegister]);
             System.out.println(memory[num + numOfRegister]);
 
@@ -55,10 +55,9 @@ public class Commands {
         System.out.println(args + " ;;;;;;");
         int num = Integer.parseInt(args.get(1));
         int numOfRegister = mipsRegisters.get(args.get(2)) + 1000;
-        if (num + numOfRegister < 2000) {
+        if (num + numOfRegister <= 2000&&num+numOfRegister>=1000) {
             memory[num + numOfRegister] = mipsRegisters.get(args.get(0));
             System.out.println(memory[num + numOfRegister]);
-
             return "";
         } else return "Unvalid memory";
     }
@@ -94,13 +93,10 @@ public class Commands {
     }
 
     public static int jr(Map<String, Integer> mipsRegisters, ArrayList<String> args) {
-
         return mipsRegisters.get(args.get(0));
-
     }
 
     public static int j(ArrayList<Instruction> codeLines, ArrayList<String> args) {
-        //System.out.println(args);
         for (int i = 0; i < codeLines.size(); i++) {
             if (codeLines.get(i).isLabel && codeLines.get(i).labelName.equals(args.get(0))) {
 
@@ -119,9 +115,9 @@ public class Commands {
                     return i;
                 }
             }
-        return currentLine;
-
-        //return -1;
+        else
+            return currentLine;
+        return -1;
     }
 
     public static int bne(Map<String, Integer> mipsRegisters, ArrayList<Instruction> codeLines, ArrayList<String> args, int currentLine) {
@@ -133,9 +129,9 @@ public class Commands {
                 }
             }
         }
-        return currentLine;
-
-        //return -1;
+        else
+            return currentLine;
+        return -1;
     }
 
 }

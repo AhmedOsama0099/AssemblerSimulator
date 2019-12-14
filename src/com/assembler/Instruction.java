@@ -25,51 +25,49 @@ public class Instruction {
         this.jType = jType;
     }
 
-    void setInstructionCode() {
+    int setInstructionCode() {
         String instructionCode = "";
         if (this.rType) {
-            if(!this.instruct.equals("sll") && !this.instruct.equals("jr")){
+            if (!this.instruct.equals("sll") && !this.instruct.equals("jr")) {
                 instructionCode += Parser.opcode.get(this.instruct);
                 String temp = "";
                 int indx = -1;
                 indx = Parser.registerIndexes.indexOf(this.args.get(1));
-                temp=Integer.toBinaryString(indx);
-                while (temp.length()<5){
-                    temp="0"+temp;
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
                 }
-                instructionCode+=temp;
+                instructionCode += temp;
 
                 indx = Parser.registerIndexes.indexOf(this.args.get(2));
-                temp=Integer.toBinaryString(indx);
-                while (temp.length()<5){
-                    temp="0"+temp;
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
                 }
-                instructionCode+=temp;
+                instructionCode += temp;
                 indx = Parser.registerIndexes.indexOf(this.args.get(0));
-                temp=Integer.toBinaryString(indx);
-                while (temp.length()<5){
-                    temp="0"+temp;
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
                 }
-                instructionCode+=temp;
-                instructionCode+="00000";
-                instructionCode+=Parser.functcode.get(this.instruct);
+                instructionCode += temp;
+                instructionCode += "00000";
+                instructionCode += Parser.functcode.get(this.instruct);
 
-            }
-            else if (this.instruct.equals("jr")){
+            } else if (this.instruct.equals("jr")) {
                 instructionCode += Parser.opcode.get(this.instruct);
                 String temp = "";
                 int indx = -1;
-                instructionCode+="00000"+"00000";
+                instructionCode += "00000" + "00000";
                 indx = Parser.registerIndexes.indexOf(this.args.get(0));
-                temp=Integer.toBinaryString(indx);
-                while (temp.length()<5){
-                    temp="0"+temp;
+                temp = Integer.toBinaryString(indx);
+                while (temp.length() < 5) {
+                    temp = "0" + temp;
                 }
-                instructionCode+=temp;
-                instructionCode+="00000";
-                instructionCode+=Parser.functcode.get(this.instruct);
-            }
-            else {
+                instructionCode += temp;
+                instructionCode += "00000";
+                instructionCode += Parser.functcode.get(this.instruct);
+            } else {
                 instructionCode += Parser.opcode.get(this.instruct);
                 String temp = "";
                 int indx = -1;
@@ -95,30 +93,62 @@ public class Instruction {
             }
 
         } else if (this.iType) {
-            instructionCode += Parser.opcode.get(this.instruct);
+            instructionCode = Parser.opcode.get(this.instruct);
             String temp = "";
-            int indx = -1;
-            indx = Parser.registerIndexes.indexOf(this.args.get(0));
-            temp=Integer.toBinaryString(indx);
-            while (temp.length()<5){
-                temp="0"+temp;
+            int indx = Parser.registerIndexes.indexOf(this.args.get(0));
+            temp = Integer.toBinaryString(indx);
+            while (temp.length() < 5) {
+                temp = "0" + temp;
             }
-            instructionCode+=temp;
+            instructionCode += temp;
             indx = Parser.registerIndexes.indexOf(this.args.get(1));
-            temp=Integer.toBinaryString(indx);
-            while (temp.length()<5){
-                temp="0"+temp;
+            temp = Integer.toBinaryString(indx);
+            while (temp.length() < 5) {
+                temp = "0" + temp;
             }
-            instructionCode+=temp;
+            instructionCode += temp;
+
             temp = Integer.toBinaryString(Integer.valueOf(this.args.get(2)));
             while (temp.length() < 16) {
                 temp = "0" + temp;
             }
             instructionCode += temp;
-        }
-        else {
-            instructionCode += Parser.opcode.get(this.instruct);
 
+
+        } else {
+            instructionCode += Parser.opcode.get(this.instruct);
         }
+        return Integer.parseInt(instructionCode);
+    }
+    int specialCaseCode(int labelPos){
+        String instructionCode="";
+        if(instruct.equals("beq")||instruct.equals("bne")){
+            instructionCode = Parser.opcode.get(this.instruct);
+            String temp = "";
+            int indx = Parser.registerIndexes.indexOf(this.args.get(0));
+            temp = Integer.toBinaryString(indx);
+            while (temp.length() < 5) {
+                temp = "0" + temp;
+            }
+            instructionCode += temp;
+            indx = Parser.registerIndexes.indexOf(this.args.get(1));
+            temp = Integer.toBinaryString(indx);
+            while (temp.length() < 5) {
+                temp = "0" + temp;
+            }
+            instructionCode += temp;
+            temp=Integer.toBinaryString(labelPos);
+            while(temp.length()<16)
+                temp="0"+temp;
+            instructionCode+=temp;
+        }
+        else if(instruct.equals("j")){
+            instructionCode = Parser.opcode.get(this.instruct);
+            String temp=Integer.toBinaryString(labelPos);
+            while(temp.length()<26)
+                temp="0"+temp;
+            instructionCode+=temp;
+        }
+        return Integer.parseInt(instructionCode);
     }
 }
