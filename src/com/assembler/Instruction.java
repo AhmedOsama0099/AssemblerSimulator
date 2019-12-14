@@ -11,7 +11,7 @@ public class Instruction {
     Boolean rType = false;
     Boolean iType = false;
     Boolean jType = false;
-    String instructionCode = "";
+
 
     public Instruction() {
     }
@@ -26,7 +26,7 @@ public class Instruction {
     }
 
     void setInstructionCode() {
-
+        String instructionCode = "";
         if (this.rType) {
             if(!this.instruct.equals("sll") && !this.instruct.equals("jr")){
                 instructionCode += Parser.opcode.get(this.instruct);
