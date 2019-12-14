@@ -114,58 +114,58 @@ public class Parser {
                 Instruction instruction = codeLines.get(i);
                 switch (instructions.indexOf(instruction.instruct)) {
                     case 0:
-                        Commands.add(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.add(mipsRegisters, instruction.args);
                         break;
                     case 1:
-                        Commands.sub(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.sub(mipsRegisters, instruction.args);
                         break;
                     case 2:
-                        Commands.and(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.and(mipsRegisters, instruction.args);
                         break;
                     case 3:
-                        Commands.or(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.or(mipsRegisters, instruction.args);
                         break;
                     case 4:
-                        Commands.sll(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.sll(mipsRegisters, instruction.args);
                         break;
                     case 5:
-                        Commands.slt(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.slt(mipsRegisters, instruction.args);
                         break;
                     case 6:
-                    if(Commands.lw(memory,mipsRegisters,instruction.args,instruction.instructionCode)=="")
+                    if(Commands.lw(memory,mipsRegisters,instruction.args)
                         break;
                     else return;
                     case 7:
-                    if(Commands.sw(memory,mipsRegisters,instruction.args,instruction.instructionCode)=="")
+                    if(Commands.sw(memory,mipsRegisters,instruction.args)
                         break;
                     else return;
                     case 8:
-                        Commands.addi(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.addi(mipsRegisters, instruction.args);
                         break;
                     case 9:
-                        Commands.andi(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.andi(mipsRegisters, instruction.args);
                         break;
                     case 10:
-                        Commands.ori(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.ori(mipsRegisters, instruction.args);
                         break;
                     case 11:
-                        Commands.slti(memory,mipsRegisters, instruction.args,instruction.instructionCode);
+                        Commands.slti(mipsRegisters, instruction.args);
                         break;
                     case 12:
                         Commands.lui();
                         break;
                     case 13:
-                        int countIndex=Commands.jr(memory,mipsRegisters,instruction.args,instruction.instructionCode);
+                        int countIndex=Commands.jr(mipsRegisters,instruction.args);
                         if (countIndex != -1)
                             i = countIndex;
                         break;
                     case 14:
-                        int index = Commands.j(memory,codeLines, instruction.args,instruction.instructionCode);
+                        int index = Commands.j(codeLines, instruction.args);
                         if (index != -1)
                             i = index;
                         break;
                     case 15:
-                        int index2 = Commands.beq(memory,mipsRegisters, codeLines, instruction.args, i,instruction.instructionCode);
+                        int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
                         if (index2 != -1) {
                             i = index2;
                         } else {
@@ -173,7 +173,7 @@ public class Parser {
                         }
                         break;
                     case 16:
-                        int index3 = Commands.bne(memory,mipsRegisters, codeLines, instruction.args, i,instruction.instructionCode);
+                        int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
                         if (index3 != -1) {
                             i = index3;
                         } else {
