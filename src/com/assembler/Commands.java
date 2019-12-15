@@ -52,7 +52,6 @@ public class Commands {
     }
 
     public static String sw(int[] memory, Map<String, Integer> mipsRegisters, ArrayList<String> args) {
-        System.out.println(args + " ;;;;;;");
         int num = Integer.parseInt(args.get(1));
         int numOfRegister = mipsRegisters.get(args.get(2)) + 1000;
         if (num + numOfRegister <= 2000&&num+numOfRegister>=1000) {
@@ -88,8 +87,9 @@ public class Commands {
             mipsRegisters.replace(args.get(0), 0);
     }
 
-    public static void lui() {
-
+    public static void lui(Map<String, Integer> mipsRegisters, ArrayList<String> args) {
+        int temp = Integer.parseInt(args.get(1));
+        mipsRegisters.replace(args.get(0),  temp<<16);
     }
 
     public static int jr(Map<String, Integer> mipsRegisters, ArrayList<String> args) {

@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 
 public class Compiler extends JFrame{
-    private JTabbedPane tabbedPane1;
     private JPanel panel1;
+    private JTextArea exceptions;
     private JTextArea inputCode;
     private JButton loadFileButton;
     private JButton startCompileButton;
@@ -23,9 +23,6 @@ public class Compiler extends JFrame{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JFileChooser chooser = new JFileChooser();
-                //FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
-                //chooser.setFileFilter(filter);
-                //chooser.setMultiSelectionEnabled(true);
                 chooser.showOpenDialog(null);
                 File f=chooser.getSelectedFile();
                 if(f!=null){
@@ -45,6 +42,29 @@ public class Compiler extends JFrame{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Parser parser=new Parser(inputCode.getText());
+                if(!parser.exceptionsInGUI.isEmpty()){
+                    exceptions.setText(parser.exceptionsInGUI);
+                }
+                else{
+                    try {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedLookAndFeelException e) {
+                        e.printStackTrace();
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            RunForm runForm = new RunForm();
+                            runForm.setVisible(true);
+                        }
+                    });
+                }
             }
         });
     }

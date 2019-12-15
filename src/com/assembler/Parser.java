@@ -1,5 +1,6 @@
 package com.assembler;
 
+import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,22 +10,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Parser {
-    private static ArrayList<Instruction> codeLines = new ArrayList<>();
-    public final Map<String, Integer> mipsRegisters = new HashMap<>();
+    public static ArrayList<Instruction> codeLines = new ArrayList<>();
+    public static Map<String, Integer> mipsRegisters = new HashMap<>();
     public static Map<String, String> opcode = new HashMap<>();
     public static Map<String, String> functcode = new HashMap<>();
     public static ArrayList<String> labelNedToBeFound = new ArrayList<>();
     public static ArrayList<String> registerIndexes = new ArrayList<>();
-    public final ArrayList<String> instructions = new ArrayList<>(
+    public static ArrayList<String> instructions = new ArrayList<>(
             Arrays.asList("add", "sub", "and", "or", "sll", "slt", "lw", "sw",
                     "addi", "andi", "ori", "slti", "lui",
                     "jr", "j", "beq", "bne"
             ));
+    public static ArrayList<String> userCodes = new ArrayList<>();
+    String exceptionsInGUI = "";
+    public static DefaultTableModel tableModelMemory = new DefaultTableModel();
     public static int[] memory = new int[2000];
 
     ///
     //
     Parser(String inputCode) {
+        registerIndexes.clear();
+        userCodes.clear();
         labelNedToBeFound.clear();
         codeLines.clear();
         opcode.clear();
@@ -94,100 +100,98 @@ public class Parser {
             }
             count++;
         }
-        System.out.println(memory[1400]);
-        System.out.println(registerIndexes);
-        System.out.println(mipsRegisters);
         String exceptions = splitCodeAndLabelsAndCheckValidate(inputCode);
+
         for (int i = 0; i < labelNedToBeFound.size(); i++) {
             String[] labelAndErrorLine = labelNedToBeFound.get(i).split(" ");
             if (!labelFound(labelAndErrorLine[0])) {
                 exceptions += labelAndErrorLine[0] + " not found at line " + labelAndErrorLine[1];
             }
         }
+
         if (!exceptions.isEmpty()) {
-            System.out.println(exceptions);
-        } else {
-            for (int i = 0; i < codeLines.size(); i++) {
-                Instruction instruction = codeLines.get(i);
-                if (!instruction.isLabel&&!(instruction.instruct.equals("j")||instruction.instruct.equals("beq")||instruction.instruct.equals("bne")))
-                    memory[i] = instruction.setInstructionCode();
-                else if(instruction.isLabel)
-                    memory[i]=Integer.parseInt(Integer.toBinaryString(i));
+            exceptionsInGUI = exceptions;
+        }
+    }
 
-                switch (instructions.indexOf(instruction.instruct)) {
-                    case 0:
-                        Commands.add(mipsRegisters, instruction.args);
-                        break;
-                    case 1:
-                        Commands.sub(mipsRegisters, instruction.args);
-                        break;
-                    case 2:
-                        Commands.and(mipsRegisters, instruction.args);
-                        break;
-                    case 3:
-                        Commands.or(mipsRegisters, instruction.args);
-                        break;
-                    case 4:
-                        Commands.sll(mipsRegisters, instruction.args);
-                        break;
-                    case 5:
-                        Commands.slt(mipsRegisters, instruction.args);
-                        break;
-                    case 6:
-                        if (Commands.lw(memory, mipsRegisters, instruction.args).isEmpty())
-                            break;
-                        else return;
-                    case 7:
-                        if (Commands.sw(memory, mipsRegisters, instruction.args).isEmpty())
-                            break;
-                        else return;
-                    case 8:
-                        Commands.addi(mipsRegisters, instruction.args);
-                        break;
-                    case 9:
-                        Commands.andi(mipsRegisters, instruction.args);
-                        break;
-                    case 10:
-                        Commands.ori(mipsRegisters, instruction.args);
-                        break;
-                    case 11:
-                        Commands.slti(mipsRegisters, instruction.args);
-                        break;
-                    case 12:
-                        Commands.lui();
-                        break;
-                    case 13:
-                        int countIndex = Commands.jr(mipsRegisters, instruction.args);
-                        if (countIndex != -1)
-                            i = countIndex;
-                        break;
-                    case 14:
-                        int index = Commands.j(codeLines, instruction.args);
+    public static void run(int i) {
+        Instruction instruction = codeLines.get(i);
+        if (!instruction.isLabel && !(instruction.instruct.equals("j") || instruction.instruct.equals("beq") || instruction.instruct.equals("bne")))
+            memory[i] = instruction.setInstructionCode();
+        else if (instruction.isLabel)
+            memory[i] = Integer.parseInt(Integer.toBinaryString(i));
 
-                        if (index != -1){
-                            i = index;
-                            memory[i]=instruction.specialCaseCode(index);
-                        }
+        switch (instructions.indexOf(instruction.instruct)) {
+            case 0:
+                Commands.add(mipsRegisters, instruction.args);
+                break;
+            case 1:
+                Commands.sub(mipsRegisters, instruction.args);
+                break;
+            case 2:
+                Commands.and(mipsRegisters, instruction.args);
+                break;
+            case 3:
+                Commands.or(mipsRegisters, instruction.args);
+                break;
+            case 4:
+                Commands.sll(mipsRegisters, instruction.args);
+                break;
+            case 5:
+                Commands.slt(mipsRegisters, instruction.args);
+                break;
+            case 6:
+                if (Commands.lw(memory, mipsRegisters, instruction.args).isEmpty())
+                    break;
+                else return;
+            case 7:
+                if (Commands.sw(memory, mipsRegisters, instruction.args).isEmpty())
+                    break;
+                else return;
+            case 8:
+                Commands.addi(mipsRegisters, instruction.args);
+                break;
+            case 9:
+                Commands.andi(mipsRegisters, instruction.args);
+                break;
+            case 10:
+                Commands.ori(mipsRegisters, instruction.args);
+                break;
+            case 11:
+                Commands.slti(mipsRegisters, instruction.args);
+                break;
+            case 12:
+                Commands.lui(mipsRegisters, instruction.args);
+                break;
+            case 13:
+                int countIndex = Commands.jr(mipsRegisters, instruction.args);
+                if (countIndex != -1)
+                    i = countIndex;
+                break;
+            case 14:
+                int index = Commands.j(codeLines, instruction.args);
 
-
-                        break;
-                    case 15:
-                        int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
-                        if (index2 != -1) {
-                            i = index2;
-                            memory[i]=instruction.specialCaseCode(index2);
-                        }
-                        break;
-                    case 16:
-                        int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
-                        if (index3 != -1) {
-                            i = index3;
-                            memory[i]=instruction.specialCaseCode(index3);
-                        }
-                        break;
+                if (index != -1) {
+                    i = index;
+                    memory[i] = instruction.specialCaseCode(index);
                 }
-            }
-            System.out.println(mipsRegisters);
+
+
+                break;
+            case 15:
+                int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
+                if (index2 != -1) {
+                    i = index2;
+                    memory[i] = instruction.specialCaseCode(index2);
+                }
+                break;
+            case 16:
+                int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
+                if (index3 != -1) {
+                    i = index3;
+                    memory[i] = instruction.specialCaseCode(index3);
+                }
+                break;
         }
     }
 
@@ -203,22 +207,20 @@ public class Parser {
 
     private String splitCodeAndLabelsAndCheckValidate(String inputCode) {
         String exceptions = "";
-        //String instruction="";
-        // boolean op = true;//first one is command
         Instruction instruction;
         String line;
-        ///String label="";
         int checkLabel;
         int currentLine = 0;
         BufferedReader reader = new BufferedReader(new StringReader(inputCode));
         try {
             while ((line = reader.readLine()) != null) {
                 currentLine++;
+                line = line.trim();
+                if (line.equals("\n"))
+                    continue;
+                userCodes.add(line);
                 instruction = new Instruction();
                 codeLines.add(instruction);
-                if (line == "\n")
-                    continue;
-                line = line.trim();
                 checkLabel = line.indexOf(":");
                 if (checkLabel != -1) {
                     if (checkLabel != line.length() - 1) {
@@ -234,15 +236,11 @@ public class Parser {
                             continue;
                         }
                         instruction.labelName = (labelName);
-                        System.out.println(labelName.trim());
                         codeLines.add(instruction);
-                        //instruction=new Instruction();
                     }
                 } else {
-
                     line = line.trim();
                     instruction.instruct = "";
-                    // boolean isInstruct = true;
                     String tmp = "";
                     for (int i = 0; i < line.length(); i++) {
                         tmp += line.charAt(i);
@@ -345,8 +343,20 @@ public class Parser {
                                     }
                                 }
                                 break;
-                            case 12:/****/
-                                instruction.iType = true;
+                            case 12:
+                                if (instruction.args.size() != 2)
+                                    exceptions += "lui arguments should be 3 at line " + currentLine + "\n";
+                                else if (instruction.args.get(0).charAt(0) == '$')
+                                    exceptions += "lui first argument should be register  at line " + currentLine + "\n";
+                                else {
+                                    try {
+                                        Integer.parseInt(instruction.args.get(1));
+                                        instruction.iType = true;
+                                    } catch (Exception e) {
+                                        exceptions += "lui second argument should be constant at line " + currentLine + "\n";
+                                    }
+                                }
+
                                 break;
                             case 13:
                                 if (instruction.args.size() != 1) {

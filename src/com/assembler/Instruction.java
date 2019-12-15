@@ -118,7 +118,7 @@ public class Instruction {
         } else {
             instructionCode += Parser.opcode.get(this.instruct);
         }
-        return Integer.parseInt(instructionCode);
+        return Integer.parseInt(instructionCode,2);
     }
     int specialCaseCode(int labelPos){
         String instructionCode="";
@@ -149,6 +149,6 @@ public class Instruction {
                 temp="0"+temp;
             instructionCode+=temp;
         }
-        return Integer.parseInt(instructionCode);
+        return Integer.parseInt(instructionCode,2);
     }
 }
