@@ -23,7 +23,7 @@ public class Parser {
             ));
     public static ArrayList<String> userCodes = new ArrayList<>();
     String exceptionsInGUI = "";
-    public static DefaultTableModel tableModelMemory = new DefaultTableModel();
+    public static DefaultTableModel tableModelMemory;
     public static int[] memory = new int[2000];
 
     ///
@@ -120,7 +120,10 @@ public class Parser {
             memory[i] = instruction.setInstructionCode();
         else if (instruction.isLabel)
             memory[i] = Integer.parseInt(Integer.toBinaryString(i));
-
+        String tmp=Integer.toString(memory[i],2);
+        while (tmp.length()<32)
+            tmp="0"+tmp;
+        tableModelMemory.setValueAt(tmp,i,2);
         switch (instructions.indexOf(instruction.instruct)) {
             case 0:
                 Commands.add(mipsRegisters, instruction.args);
@@ -145,7 +148,7 @@ public class Parser {
                     break;
                 else return;
             case 7:
-                if (Commands.sw(memory, mipsRegisters, instruction.args).isEmpty())
+                if (Commands.sw(memory, mipsRegisters, instruction.args,tableModelMemory).isEmpty())
                     break;
                 else return;
             case 8:
@@ -458,6 +461,9 @@ public class Parser {
             exceptions += "error at line " + currentLine + "\n";
         }
         if (exceptions.isEmpty()) {
+            String s=newArgs.get(1);
+            newArgs.remove(1);
+            newArgs.add(s);
             instruction.args = newArgs;
         }
         return exceptions;

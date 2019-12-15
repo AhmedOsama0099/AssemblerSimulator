@@ -1,5 +1,6 @@
 package com.assembler;
 
+import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -41,22 +42,24 @@ public class Commands {
     }
 
     public static String lw(int[] memory, Map<String, Integer> mipsRegisters, ArrayList<String> args) {
-        int num = Integer.parseInt(args.get(1));
-        int numOfRegister = mipsRegisters.get(args.get(2)) + 1000;
+        int num = Integer.parseInt(args.get(2));
+        int numOfRegister = mipsRegisters.get(args.get(1)) + 1000;
         if (num + numOfRegister <= 2000&&num+numOfRegister>=1000) {
             mipsRegisters.replace(args.get(0), memory[num + numOfRegister]);
-            System.out.println(memory[num + numOfRegister]);
 
             return "";
         } else return "Unvalid memory";
     }
 
-    public static String sw(int[] memory, Map<String, Integer> mipsRegisters, ArrayList<String> args) {
-        int num = Integer.parseInt(args.get(1));
-        int numOfRegister = mipsRegisters.get(args.get(2)) + 1000;
+    public static String sw(int[] memory, Map<String, Integer> mipsRegisters, ArrayList<String> args, DefaultTableModel tableModelMemory) {
+        int num = Integer.parseInt(args.get(2));
+        int numOfRegister = mipsRegisters.get(args.get(1)) + 1000;
         if (num + numOfRegister <= 2000&&num+numOfRegister>=1000) {
             memory[num + numOfRegister] = mipsRegisters.get(args.get(0));
-            System.out.println(memory[num + numOfRegister]);
+            String tmp=Integer.toString(memory[num+numOfRegister],2);
+            while (tmp.length()<32)
+                tmp="0"+tmp;
+            tableModelMemory.setValueAt(tmp,num+numOfRegister,2);
             return "";
         } else return "Unvalid memory";
     }

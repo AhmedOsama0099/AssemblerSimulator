@@ -107,7 +107,6 @@ public class Instruction {
                 temp = "0" + temp;
             }
             instructionCode += temp;
-
             temp = Integer.toBinaryString(Integer.valueOf(this.args.get(2)));
             while (temp.length() < 16) {
                 temp = "0" + temp;

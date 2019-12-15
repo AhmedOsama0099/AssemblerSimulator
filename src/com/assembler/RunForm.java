@@ -55,6 +55,14 @@ public class RunForm extends JFrame {
         runWholeProgramButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                for(int i=1000;i<2000;i++){
+                    try{
+                        Parser.memory[i]= Integer.parseInt((String) tableModelMemory.getValueAt(i,3),2);
+                    }catch (Exception e){
+                        Parser.memory[i]=0;
+                    }
+
+                }
                 registers.setEnabled(false);
                 runNextLineButton.setEnabled(false);
                 runWholeProgramButton.setEnabled(false);

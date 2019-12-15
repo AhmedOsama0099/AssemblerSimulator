@@ -46,6 +46,7 @@ public class Compiler extends JFrame{
                     exceptions.setText(parser.exceptionsInGUI);
                 }
                 else{
+                    exceptions.setText("");
                     try {
                         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     } catch (ClassNotFoundException e) {
