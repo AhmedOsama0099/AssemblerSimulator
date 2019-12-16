@@ -117,6 +117,9 @@ public class Instruction {
         } else {
             instructionCode += Parser.opcode.get(this.instruct);
         }
+        System.out.println(instructionCode);
+        if(instructionCode.charAt(0)=='1')
+            return -1*Integer.parseInt(instructionCode.substring(1),2);
         return Integer.parseInt(instructionCode,2);
     }
     int specialCaseCode(int labelPos){
@@ -148,6 +151,8 @@ public class Instruction {
                 temp="0"+temp;
             instructionCode+=temp;
         }
+        if(instructionCode.charAt(0)=='1')
+            return -1*Integer.parseInt(instructionCode.substring(1),2);
         return Integer.parseInt(instructionCode,2);
     }
 }

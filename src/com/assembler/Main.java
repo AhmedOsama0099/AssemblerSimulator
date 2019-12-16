@@ -10,8 +10,7 @@ public class Main {
        /* String hexStr = Integer.toString(570425359,2);
         System.out.println(hexStr);
         System.out.println();*/
-        int x= (int) 4294967295l;
-        System.out.println(x);
+        System.out.println("11111".substring(0,4));
         //600851475143
     }
 }

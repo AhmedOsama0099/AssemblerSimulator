@@ -114,16 +114,26 @@ public class Parser {
         }
     }
 
-    public static void run(int i) {
+    public static int run(int i) {
         Instruction instruction = codeLines.get(i);
         if (!instruction.isLabel && !(instruction.instruct.equals("j") || instruction.instruct.equals("beq") || instruction.instruct.equals("bne")))
             memory[i] = instruction.setInstructionCode();
         else if (instruction.isLabel)
             memory[i] = Integer.parseInt(Integer.toBinaryString(i));
-        String tmp=Integer.toString(memory[i],2);
-        while (tmp.length()<32)
-            tmp="0"+tmp;
-        tableModelMemory.setValueAt(tmp,i,2);
+        if(memory[i]>=0){
+            String tmp=Integer.toString(memory[i],2);
+            while (tmp.length()<32)
+                tmp="0"+tmp;
+            tableModelMemory.setValueAt(tmp,i,2);
+        }
+        else{
+            String tmp=Integer.toString(-1*memory[i],2);
+            while (tmp.length()<31)
+                tmp="0"+tmp;
+            tmp="1"+tmp;
+            tableModelMemory.setValueAt(tmp,i,2);
+        }
+
         switch (instructions.indexOf(instruction.instruct)) {
             case 0:
                 Commands.add(mipsRegisters, instruction.args);
@@ -146,11 +156,11 @@ public class Parser {
             case 6:
                 if (Commands.lw(memory, mipsRegisters, instruction.args).isEmpty())
                     break;
-                else return;
+                else return -1;///
             case 7:
                 if (Commands.sw(memory, mipsRegisters, instruction.args,tableModelMemory).isEmpty())
                     break;
-                else return;
+                else return -1;///
             case 8:
                 Commands.addi(mipsRegisters, instruction.args);
                 break;
@@ -196,6 +206,7 @@ public class Parser {
                 }
                 break;
         }
+        return i;
     }
 
     private boolean labelFound(String s) {

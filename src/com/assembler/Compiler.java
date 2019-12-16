@@ -19,6 +19,7 @@ public class Compiler extends JFrame{
         setSize(800, 600);
         add(panel1);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         loadFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -41,7 +42,12 @@ public class Compiler extends JFrame{
         startCompileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Parser parser=new Parser(inputCode.getText());
+                String code=inputCode.getText().trim();
+                if(code.isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Empty code!");
+                    return;
+                }
+                Parser parser=new Parser(code);
                 if(!parser.exceptionsInGUI.isEmpty()){
                     exceptions.setText(parser.exceptionsInGUI);
                 }
