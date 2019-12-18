@@ -49,7 +49,7 @@ public class Compiler extends JFrame{
                 }
                 Parser parser=new Parser(code);
                 if(!parser.exceptionsInGUI.isEmpty()){
-                    exceptions.setText(parser.exceptionsInGUI);
+                    exceptions.setText(parser.exceptionsInGUI);//
                 }
                 else{
                     exceptions.setText("");

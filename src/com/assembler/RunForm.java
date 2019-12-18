@@ -136,7 +136,7 @@ public class RunForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 for(int i=0;i<2000;i++){
-                    Parser.memory[i]=0;
+                    Parser.memory[i]=0;//
                     tableModelMemory.setValueAt(0,i,2);
                 }
                 for(int i=0;i<Parser.registerIndexes.size();i++){
