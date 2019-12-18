@@ -226,6 +226,7 @@ public class Parser {
         int checkLabel;
         int currentLine = 0;
         BufferedReader reader = new BufferedReader(new StringReader(inputCode));
+        ArrayList<String>labelCheck=new ArrayList<>();
         try {
             while ((line = reader.readLine()) != null) {
                 currentLine++;
@@ -250,7 +251,11 @@ public class Parser {
                             continue;
                         }
                         instruction.labelName = (labelName);
-                        codeLines.add(instruction);
+                        if(labelCheck.contains(instruction.labelName))
+                            exceptions+="label at line "+currentLine+" was found before\n";
+                        else
+                            labelCheck.add(instruction.labelName);
+                        //codeLines.add(instruction);
                     }
                 } else {
                     line = line.trim();

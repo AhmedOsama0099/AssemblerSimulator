@@ -22,6 +22,7 @@ public class RunForm extends JFrame {
     private JButton runWholeProgramButton;
     private JButton runNextLineButton;
     private JLabel progCount;
+    private JButton resetButton;
     int programCount = 0;
 
     RunForm() {
@@ -44,11 +45,10 @@ public class RunForm extends JFrame {
 
         Parser.tableModelMemory = tableModelMemory;
         for (int i = 0; i < 2000; i++) {
-
             tableModelMemory.insertRow(tableModelMemory.getRowCount(), new Object[]{i, "0x" + Integer.toString(i, 16), 0});
         }
-        TableColumnModel columnModel = memory.getColumnModel();
 
+        TableColumnModel columnModel = memory.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(30);
         columnModel.getColumn(1).setPreferredWidth(50);
         columnModel.getColumn(2).setPreferredWidth(220);
@@ -57,11 +57,11 @@ public class RunForm extends JFrame {
         registers.setModel(tableModelRegisters);
         tableModelRegisters.addColumn("Register");
         tableModelRegisters.addColumn("Value");
-        System.out.println(Parser.registerIndexes);
-        System.out.println(Parser.registerIndexes.size());
         for (String reg : Parser.registerIndexes) {
             tableModelRegisters.insertRow(tableModelRegisters.getRowCount(), new Object[]{reg, Parser.mipsRegisters.get(reg)});
         }
+
+
         runWholeProgramButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -80,19 +80,20 @@ public class RunForm extends JFrame {
                     JOptionPane.showMessageDialog(null, exceptions);
                     return;
                 }
-                registers.setEnabled(false);
                 runNextLineButton.setEnabled(false);
                 runWholeProgramButton.setEnabled(false);
+                memory.setEnabled(false);
                 for (; programCount < Parser.codeLines.size(); programCount++) {
                     programCount = Parser.run(programCount);
                     progCount.setText(String.valueOf(programCount));
+                    code.setSelectedIndex(programCount);
                     for (int j = 0; j < Parser.registerIndexes.size(); j++) {
                         tableModelRegisters.setValueAt(Parser.mipsRegisters.get(Parser.registerIndexes.get(j)), j, 1);
                     }
                 }
                 programCount = 0;
-                runNextLineButton.setEnabled(true);
-                runWholeProgramButton.setEnabled(true);
+                //runNextLineButton.setEnabled(true);
+                //runWholeProgramButton.setEnabled(true);
             }
         });
         runNextLineButton.addActionListener(new ActionListener() {
@@ -116,24 +117,37 @@ public class RunForm extends JFrame {
                     }
                 }
 
-                registers.setEnabled(false);
                 runWholeProgramButton.setEnabled(false);
                 memory.setEnabled(false);
-
                 programCount = Parser.run(programCount);
                 progCount.setText(String.valueOf(programCount));
                 for (int j = 0; j < Parser.registerIndexes.size(); j++) {
                     tableModelRegisters.setValueAt(Parser.mipsRegisters.get(Parser.registerIndexes.get(j)), j, 1);
                 }
+                code.setSelectedIndex(programCount);
                 programCount++;
                 if (programCount == Parser.codeLines.size()) {
                     programCount = 0;
-                    runNextLineButton.setEnabled(true);
-                    runWholeProgramButton.setEnabled(true);
-                    memory.setEnabled(true);
+                    runNextLineButton.setEnabled(false);
                 }
-
-
+            }
+        });
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                for(int i=0;i<2000;i++){
+                    Parser.memory[i]=0;
+                    tableModelMemory.setValueAt(0,i,2);
+                }
+                for(int i=0;i<Parser.registerIndexes.size();i++){
+                    Parser.mipsRegisters.replace(Parser.registerIndexes.get(i),0);
+                    tableModelRegisters.setValueAt(0,i,1);
+                }
+                memory.setEnabled(true);
+                runNextLineButton.setEnabled(true);
+                runWholeProgramButton.setEnabled(true);
+                code.clearSelection();
+                progCount.setText(String.valueOf(programCount));
             }
         });
     }
