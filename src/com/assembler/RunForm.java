@@ -147,6 +147,7 @@ public class RunForm extends JFrame {
                 runNextLineButton.setEnabled(true);
                 runWholeProgramButton.setEnabled(true);
                 code.clearSelection();
+                programCount=0;
                 progCount.setText(String.valueOf(programCount));
             }
         });
