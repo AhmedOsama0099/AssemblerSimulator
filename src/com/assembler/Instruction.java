@@ -122,12 +122,14 @@ public class Instruction {
         return Integer.parseInt(instructionCode,2);
     }
     int specialCaseCode(int labelPos){
+        System.out.println(labelPos+"    ;;;;------");
         String instructionCode="";
         if(instruct.equals("beq")||instruct.equals("bne")){
             instructionCode = Parser.opcode.get(this.instruct);
             String temp = "";
             int indx = Parser.registerIndexes.indexOf(this.args.get(0));
             temp = Integer.toBinaryString(indx);
+            System.out.println(temp+" "+indx);
             while (temp.length() < 5) {
                 temp = "0" + temp;
             }

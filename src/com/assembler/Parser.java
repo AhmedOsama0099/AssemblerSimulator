@@ -116,23 +116,32 @@ public class Parser {
 
     public static int run(int i) {
         Instruction instruction = codeLines.get(i);
-        if (!instruction.isLabel && !(instruction.instruct.equals("j") || instruction.instruct.equals("beq") || instruction.instruct.equals("bne")))
+        boolean notSpecial=false;
+        if (!instruction.isLabel && !(instruction.instruct.equals("j") || instruction.instruct.equals("beq") || instruction.instruct.equals("bne"))){
             memory[i] = instruction.setInstructionCode();
-        else if (instruction.isLabel)
-            memory[i] = Integer.parseInt(Integer.toBinaryString(i));
-        if(memory[i]>=0){
-            String tmp=Integer.toString(memory[i],2);
-            while (tmp.length()<32)
-                tmp="0"+tmp;
-            tableModelMemory.setValueAt(tmp,i,2);
+            notSpecial=true;
+
         }
-        else{
-            String tmp=Integer.toString(-1*memory[i],2);
-            while (tmp.length()<31)
-                tmp="0"+tmp;
-            tmp="1"+tmp;
-            tableModelMemory.setValueAt(tmp,i,2);
+        else if (instruction.isLabel){
+            memory[i] = i;
+            notSpecial=true;
         }
+        if(notSpecial){
+            if(memory[i]>=0){
+                String tmp=Integer.toString(memory[i],2);
+                while (tmp.length()<32)
+                    tmp="0"+tmp;
+                tableModelMemory.setValueAt(tmp,i,2);
+            }
+            else{
+                String tmp=Integer.toString(-1*memory[i],2);
+                while (tmp.length()<31)
+                    tmp="0"+tmp;
+                tmp="1"+tmp;
+                tableModelMemory.setValueAt(tmp,i,2);
+            }
+        }
+
 
         switch (instructions.indexOf(instruction.instruct)) {
             case 0:
