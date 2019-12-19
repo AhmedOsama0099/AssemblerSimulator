@@ -102,13 +102,6 @@ public class Parser {
         }
         String exceptions = splitCodeAndLabelsAndCheckValidate(inputCode);
 
-        for (int i = 0; i < labelNedToBeFound.size(); i++) {
-            String[] labelAndErrorLine = labelNedToBeFound.get(i).split(" ");
-            if (!labelFound(labelAndErrorLine[0])) {
-                exceptions += labelAndErrorLine[0] + " not found at line " + labelAndErrorLine[1];
-            }
-        }
-
         if (!exceptions.isEmpty()) {
             exceptionsInGUI = exceptions;
         }
@@ -194,8 +187,34 @@ public class Parser {
                 int index = Commands.j(codeLines, instruction.args);
 
                 if (index != -1) {
-                    i = index;
                     memory[i] = instruction.specialCaseCode(index);
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    i = index;
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
                 }
 
 
@@ -203,15 +222,69 @@ public class Parser {
             case 15:
                 int index2 = Commands.beq(mipsRegisters, codeLines, instruction.args, i);
                 if (index2 != -1) {
-                    i = index2;
+
                     memory[i] = instruction.specialCaseCode(index2);
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    i = index2;
+                    memory[i] = i;
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
                 }
                 break;
             case 16:
                 int index3 = Commands.bne(mipsRegisters, codeLines, instruction.args, i);
                 if (index3 != -1) {
-                    i = index3;
                     memory[i] = instruction.specialCaseCode(index3);
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    i = index3;
+                    if(memory[i]>=0){
+                        String tmp=Integer.toString(memory[i],2);
+                        while (tmp.length()<32)
+                            tmp="0"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
+                    else{
+                        String tmp=Integer.toString(-1*memory[i],2);
+                        while (tmp.length()<31)
+                            tmp="0"+tmp;
+                        tmp="1"+tmp;
+                        tableModelMemory.setValueAt(tmp,i,2);
+                    }
                 }
                 break;
         }
