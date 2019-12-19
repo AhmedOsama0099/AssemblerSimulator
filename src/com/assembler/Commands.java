@@ -110,14 +110,9 @@ public class Commands {
     }
 
     public static int beq(Map<String, Integer> mipsRegisters, ArrayList<Instruction> codeLines, ArrayList<String> args, int currentLine) {
-        for (Instruction instruction : codeLines) {
-            if (instruction.isLabel)
-                System.out.println(instruction.labelName);
-        }
+
         int temp = mipsRegisters.get(args.get(1));// beq s0,s1,asdad
-        System.out.println("==============  " + args.get(2));
         if (mipsRegisters.get(args.get(0)) == temp) {
-            System.out.println("zzzzzzzzzzzzzzzzzzzzzzzzzzz");
             for (int i = 0; i < codeLines.size(); i++) {
                 if (codeLines.get(i).isLabel && codeLines.get(i).labelName.equals(args.get(2))) {
                     return i;
